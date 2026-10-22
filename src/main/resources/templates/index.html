@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo='Cartelera')}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido">
+	<section class="hero" th:if="${home.featured != null}">
+		<div class="hero-copy">
+			<p class="eyebrow">En cartelera · <span th:text="${home.cityLabel}">Todas las ciudades</span></p>
+			<h1 th:text="${home.featured.title}">El último verano</h1>
+			<p class="lede" th:text="${home.featured.tagline}"></p>
+			<p class="hero-meta">
+				<span th:text="${home.featured.genre}">Drama</span>
+				<span th:text="${home.featured.runtime}">118 min</span>
+				<span class="rating" th:classappend="'rating-' + ${home.featured.ratingKey}" th:text="${home.featured.rating}" th:title="${home.featured.ratingHint}">+13</span>
+				<span th:text="${home.featured.director}">Dirección</span>
+			</p>
+			<p class="hero-next" th:text="${home.featured.nextShow}">Hoy 21:00</p>
+			<div class="hero-actions">
+				<a class="button" th:href="@{/peliculas/{slug}(slug=${home.featured.slug})}">Ver funciones</a>
+				<span class="price-note" th:if="${!#strings.isEmpty(home.featured.priceFrom)}" th:text="${home.featured.priceFrom}"></span>
+			</div>
+		</div>
+		<a class="poster hero-poster" th:classappend="'motif-' + ${home.featured.motif}"
+		   th:style="'--bg:' + ${home.featured.posterBg} + ';--accent:' + ${home.featured.posterAccent}"
+		   th:href="@{/peliculas/{slug}(slug=${home.featured.slug})}"
+		   th:aria-label="'Ver ' + ${home.featured.title}">
+			<span class="poster-kicker" th:text="${home.featured.genre}">Drama</span>
+		</a>
+	</section>
+
+	<section class="sheet">
+		<div class="sheet-head">
+			<div>
+				<p class="eyebrow">Cartelera</p>
+				<h2 th:text="${home.filtrando} ? 'Resultados' : 'Esta semana'">Esta semana</h2>
+			</div>
+			<p class="result-count" th:text="${home.total} + (${home.total == 1} ? ' película · ' : ' películas · ') + ${home.cityLabel}">9 películas</p>
+		</div>
+
+		<form class="filters" method="get" action="/">
+			<label class="grow">
+				<span class="sr-only">Buscar</span>
+				<input type="search" name="q" th:value="${home.query}" placeholder="Buscar por título, director o género">
+			</label>
+			<label>
+				<span class="sr-only">Género</span>
+				<select name="genero">
+					<option value="">Todos los géneros</option>
+					<option th:each="g : ${home.genres}" th:value="${g.value}" th:text="${g.label}" th:selected="${g.selected}"></option>
+				</select>
+			</label>
+			<button class="button button-ink" type="submit">Filtrar</button>
+			<a class="text-link" th:if="${home.filtrando}" href="/">Limpiar</a>
+		</form>
+
+		<ol class="steps" th:unless="${home.filtrando}">
+			<li><span>1</span> Elegí la película</li>
+			<li><span>2</span> Elegí horario y complejo</li>
+			<li><span>3</span> Marcá tus butacas y listo</li>
+		</ol>
+
+		<section class="rail-wrap" th:if="${!home.rail.isEmpty()}">
+			<div class="rail-head">
+				<h3 th:text="${home.railLabel}">Hoy</h3>
+				<p>Las próximas funciones</p>
+			</div>
+			<div class="rail">
+				<a th:each="item : ${home.rail}" th:href="@{/funciones/{id}(id=${item.showtimeId})}">
+					<time th:text="${item.time}">21:00</time>
+					<strong th:text="${item.title}">Título</strong>
+					<span th:text="${item.place}">Palermo</span>
+					<em th:class="'fmt fmt-' + ${item.formatKey}" th:text="${item.format}">2D</em>
+				</a>
+			</div>
+		</section>
+
+		<p class="empty" th:if="${home.featured == null and home.cartelera.isEmpty()}">No hay películas en cartelera con ese filtro.</p>
+
+		<div class="grid">
+			<article class="card" th:each="card : ${home.cartelera}">
+				<a th:href="@{/peliculas/{slug}(slug=${card.slug})}">
+					<div class="poster" th:classappend="'motif-' + ${card.motif}" th:style="'--bg:' + ${card.posterBg} + ';--accent:' + ${card.posterAccent}">
+						<span class="poster-kicker" th:text="${card.genre}">Drama</span>
+						<span class="rating" th:classappend="'rating-' + ${card.ratingKey}" th:text="${card.rating}" th:title="${card.ratingHint}">+13</span>
+						<h3 th:text="${card.title}">Título</h3>
+					</div>
+					<div class="card-body">
+						<p th:text="${card.tagline}">Tagline</p>
+						<p class="card-next" th:text="${card.nextShow}">Hoy 21:00</p>
+						<p class="card-price" th:if="${!#strings.isEmpty(card.priceFrom)}" th:text="${card.priceFrom}">Desde $ 7.900</p>
+					</div>
+				</a>
+			</article>
+		</div>
+
+		<section class="upcoming" th:if="${!home.proximamente.isEmpty()}">
+			<div class="sheet-head">
+				<div>
+					<p class="eyebrow">En camino</p>
+					<h2>Próximamente</h2>
+				</div>
+			</div>
+			<div class="upcoming-row">
+				<a th:each="card : ${home.proximamente}" th:href="@{/peliculas/{slug}(slug=${card.slug})}">
+					<div class="poster poster-wide" th:classappend="'motif-' + ${card.motif}" th:style="'--bg:' + ${card.posterBg} + ';--accent:' + ${card.posterAccent}">
+						<span class="poster-kicker" th:text="${card.genre}">Aventura</span>
+						<h3 th:text="${card.title}">Viento norte</h3>
+					</div>
+					<p th:text="${card.tagline}"></p>
+					<p class="card-next" th:text="${card.nextShow}">Estrena el 12 de noviembre</p>
+				</a>
+			</div>
+		</section>
+	</section>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+</body>
+</html>

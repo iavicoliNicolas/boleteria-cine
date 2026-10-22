@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:fragment="head(titulo)">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#12100e">
+	<meta name="description" content="Platea, boletería de cine. Elegí la película, la función y la butaca.">
+	<title th:text="${titulo} + ' · Platea'">Platea</title>
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,560;0,9..144,680;1,9..144,560&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/platea.css(v=3)}">
+</head>
+<body>
+<header th:fragment="header" class="site-header">
+	<a class="skip" href="#contenido">Saltar al contenido</a>
+	<a class="brand" href="/" aria-label="Platea, inicio">
+		<svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+			<rect x="5" y="7" width="22" height="13" rx="3"></rect>
+			<path d="M8 20.5v4.5M24 20.5v4.5M9 25h14"></path>
+		</svg>
+		<span>
+			<strong>Platea</strong>
+			<small>boletería de cine</small>
+		</span>
+	</a>
+	<nav class="site-nav" aria-label="Principal">
+		<a th:href="@{/}" th:classappend="${ruta == '/'} ? 'is-active' : ''" th:attr="aria-current=${ruta == '/'} ? 'page' : null">Cartelera</a>
+		<a th:href="@{/complejos}" th:classappend="${ruta != null and #strings.startsWith(ruta, '/complejos')} ? 'is-active' : ''" th:attr="aria-current=${ruta != null and #strings.startsWith(ruta, '/complejos')} ? 'page' : null">Complejos</a>
+		<a th:href="@{/mis-entradas}" th:classappend="${ruta != null and (#strings.startsWith(ruta, '/mis-entradas') or #strings.startsWith(ruta, '/entradas'))} ? 'is-active' : ''" th:attr="aria-current=${ruta != null and (#strings.startsWith(ruta, '/mis-entradas') or #strings.startsWith(ruta, '/entradas'))} ? 'page' : null">Mis entradas</a>
+	</nav>
+	<form class="city-form" method="get" th:action="${ruta != null ? ruta : '/'}">
+		<label for="ciudad">Ciudad</label>
+		<select id="ciudad" name="ciudad" onchange="this.form.submit()">
+			<option value="" th:selected="${ciudadActiva == null}">Todas las ciudades</option>
+			<option th:each="c : ${ciudades}" th:value="${c}" th:text="${c}" th:selected="${c == ciudadActiva}"></option>
+		</select>
+		<button type="submit">Ver</button>
+	</form>
+</header>
+<footer th:fragment="footer" class="site-footer">
+	<div>
+		<strong>Platea</strong>
+		<p>Boletería de cine de demostración. Los pagos son simulados y no se hace ningún cargo.</p>
+	</div>
+	<nav aria-label="Pie">
+		<a href="/">Cartelera</a>
+		<a href="/complejos">Complejos</a>
+		<a href="/mis-entradas">Mis entradas</a>
+	</nav>
+	<p class="copy" th:text="'© ' + ${anio} + ' Platea'">© Platea</p>
+</footer>
+</body>
+</html>

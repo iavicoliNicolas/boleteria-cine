@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo='Complejos')}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido" class="sheet">
+	<div class="sheet-head">
+		<div>
+			<p class="eyebrow">Salas</p>
+			<h1>Complejos</h1>
+		</div>
+		<p class="result-count" th:text="${cityLabel}">Todas las ciudades</p>
+	</div>
+	<p class="lede">Seis Platea entre Buenos Aires, Córdoba, Rosario y Mendoza. Cambiá la ciudad arriba para filtrar.</p>
+	<p class="empty" th:if="${complejos.isEmpty()}">No hay complejos en esta ciudad.</p>
+	<div class="complex-grid">
+		<a class="complex-card" th:each="c : ${complejos}" th:href="@{/complejos/{slug}(slug=${c.slug})}">
+			<p class="eyebrow" th:text="${c.city}">Buenos Aires</p>
+			<h2 th:text="${c.name}">Platea Palermo</h2>
+			<p th:text="${c.neighborhood} + ' · ' + ${c.address}">Dirección</p>
+			<p class="card-next" th:text="${c.rooms == 1} ? '1 sala' : (${c.rooms} + ' salas')">3 salas</p>
+		</a>
+	</div>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo='Error')}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido" class="sheet narrow">
+	<p class="eyebrow" th:text="${status}">404</p>
+	<h1 th:text="${status == 404} ? 'Esa página no está en la cartelera' : 'Algo salió mal'">Error</h1>
+	<p class="lede" th:text="${status == 404} ? 'El link no corresponde a una película, una función ni una entrada.' : 'Volvé a intentar en un momento.'">Mensaje</p>
+	<a class="button" href="/">Ir a la cartelera</a>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+</body>
+</html>

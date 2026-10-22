@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo='Mis entradas')}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido" class="sheet narrow">
+	<p class="eyebrow">Recuperar</p>
+	<h1>Mis entradas</h1>
+	<p class="lede">Buscá con el email de la compra o con el código que empieza con PLT-.</p>
+	<form class="lookup" method="get" action="/mis-entradas">
+		<label class="grow">
+			<span class="sr-only">Email o código</span>
+			<input type="search" name="q" th:value="${query}" placeholder="ana@email.com o PLT-ABC123" required>
+		</label>
+		<button class="button" type="submit">Buscar</button>
+	</form>
+	<p class="banner" th:if="${mensaje}" th:text="${mensaje}" role="status"></p>
+	<ul class="ticket-list" th:if="${resultados != null and !resultados.isEmpty()}">
+		<li th:each="item : ${resultados}">
+			<a th:href="@{/entradas/{code}(code=${item.code})}">
+				<strong th:text="${item.title}">Película</strong>
+				<span class="code" th:text="${item.code}">PLT-ABC123</span>
+				<span th:text="${item.when}">Cuándo</span>
+				<span th:text="${item.cinema}">Complejo</span>
+				<span th:text="${item.seats}">C5</span>
+				<em th:text="${item.total}">$ 7.900</em>
+			</a>
+		</li>
+	</ul>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo=${complejo.name})}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido" class="sheet">
+	<p class="crumb"><a href="/complejos">Complejos</a> <span aria-hidden="true">/</span> <span th:text="${complejo.name}">Platea</span></p>
+	<p class="eyebrow" th:text="${complejo.city} + ' · ' + ${complejo.neighborhood}">Ciudad</p>
+	<h1 th:text="${complejo.name}">Platea Palermo</h1>
+	<p class="lede" th:text="${complejo.address} + ' · ' + ${complejo.rooms} + (${complejo.rooms == 1} ? ' sala' : ' salas')">Dirección</p>
+
+	<section>
+		<div class="sheet-head">
+			<div>
+				<p class="eyebrow" th:text="${complejo.windowLabel}">Hoy y mañana</p>
+				<h2>Funciones</h2>
+			</div>
+		</div>
+		<p class="empty" th:if="${complejo.movies.isEmpty()}">No quedan funciones para hoy ni mañana.</p>
+		<article class="cinema-movie" th:each="movie : ${complejo.movies}">
+			<a class="mini-poster poster" th:classappend="'motif-' + ${movie.motif}" th:style="'--bg:' + ${movie.posterBg} + ';--accent:' + ${movie.posterAccent}" th:href="@{/peliculas/{slug}(slug=${movie.slug})}">
+				<span class="rating" th:classappend="'rating-' + ${movie.ratingKey}" th:text="${movie.rating}">+13</span>
+				<strong th:text="${movie.title}">Título</strong>
+			</a>
+			<div class="show-row">
+				<a th:each="show : ${movie.showtimes}" class="show" th:classappend="${show.soldOut} ? 'is-sold' : ''"
+				   th:href="@{/funciones/{id}(id=${show.id})}">
+					<time th:text="${show.time}">21:00</time>
+					<span><em th:class="'fmt fmt-' + ${show.formatKey}" th:text="${show.format}">2D</em> · <span th:text="${show.language}">SUB</span></span>
+					<small th:text="${show.auditorium}">Sala 1</small>
+					<strong th:text="${show.soldOut} ? 'Agotada' : ${show.price}">$ 7.900</strong>
+				</a>
+			</div>
+		</article>
+	</section>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+</body>
+</html>

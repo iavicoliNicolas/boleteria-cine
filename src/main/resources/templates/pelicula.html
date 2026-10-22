@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo=${movie.info.title})}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido" class="sheet movie-page">
+	<article class="movie-hero">
+		<div class="poster movie-poster" th:classappend="'motif-' + ${movie.info.motif}" th:style="'--bg:' + ${movie.info.posterBg} + ';--accent:' + ${movie.info.posterAccent}">
+			<span class="poster-kicker" th:text="${movie.info.genre}">Drama</span>
+			<span class="rating" th:classappend="'rating-' + ${movie.info.ratingKey}" th:text="${movie.info.rating}" th:title="${movie.info.ratingHint}">+13</span>
+		</div>
+		<div>
+			<p class="eyebrow" th:text="${movie.info.nowShowing} ? 'En cartelera' : 'Próximamente'">En cartelera</p>
+			<h1 th:text="${movie.info.title}">Título</h1>
+			<p class="lede" th:text="${movie.info.tagline}"></p>
+			<p class="synopsis" th:text="${movie.info.synopsis}"></p>
+			<dl class="facts">
+				<div><dt>Dirección</dt><dd th:text="${movie.info.director}">Nombre</dd></div>
+				<div><dt>Elenco</dt><dd th:text="${movie.info.cast}">Elenco</dd></div>
+				<div><dt>Duración</dt><dd th:text="${movie.info.runtime}">118 min</dd></div>
+				<div><dt>Estreno</dt><dd th:text="${movie.info.release}">22 de octubre</dd></div>
+				<div><dt>Clasificación</dt><dd th:text="${movie.info.rating} + ' · ' + ${movie.info.ratingHint}">+13</dd></div>
+			</dl>
+		</div>
+	</article>
+
+	<section class="schedule" th:if="${movie.schedule}">
+		<div class="sheet-head">
+			<div>
+				<p class="eyebrow">Funciones</p>
+				<h2 th:text="${movie.selectedLabel}">Jueves 22 de octubre</h2>
+			</div>
+		</div>
+		<div class="days" role="tablist" aria-label="Días">
+			<a th:each="day : ${movie.days}"
+			   th:href="@{/peliculas/{slug}(slug=${movie.info.slug}, fecha=${day.iso})}"
+			   th:class="${day.selected} ? 'is-selected' : ''"
+			   th:classappend="${!day.available} ? ' is-empty' : ''"
+			   th:attr="aria-current=${day.selected} ? 'date' : null"
+			   th:text="${day.label}">Hoy</a>
+		</div>
+		<p class="banner" th:if="${movie.banner != null}" th:text="${movie.banner}"></p>
+		<section class="complex-block" th:each="group : ${movie.groups}">
+			<header>
+				<h3><a th:href="@{/complejos/{slug}(slug=${group.slug})}" th:text="${group.name}">Platea Palermo</a></h3>
+				<p th:text="${group.meta}">Palermo · Av. Santa Fe 3253</p>
+			</header>
+			<div class="show-row">
+				<a th:each="show : ${group.showtimes}" class="show" th:classappend="${show.soldOut} ? 'is-sold' : ''"
+				   th:href="@{/funciones/{id}(id=${show.id})}">
+					<time th:text="${show.time}">21:00</time>
+					<span><em th:class="'fmt fmt-' + ${show.formatKey}" th:text="${show.format}">2D</em> · <span th:text="${show.language}">SUB</span></span>
+					<small th:text="${show.auditorium}">Sala 1</small>
+					<strong th:text="${show.soldOut} ? 'Agotada' : ${show.price}">$ 7.900</strong>
+				</a>
+			</div>
+		</section>
+	</section>
+
+	<section th:if="${!movie.schedule}" class="premiere">
+		<p class="banner" th:text="${movie.banner}">Todavía no hay funciones a la venta.</p>
+		<a class="button button-ink" href="/">Volver a la cartelera</a>
+	</section>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+</body>
+</html>

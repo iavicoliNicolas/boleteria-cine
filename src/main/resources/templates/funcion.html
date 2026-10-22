@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo=${funcion.title})}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido" class="sheet">
+	<p class="crumb">
+		<a href="/">Cartelera</a>
+		<span aria-hidden="true">/</span>
+		<a th:href="@{/peliculas/{slug}(slug=${funcion.slug}, fecha=${funcion.dateIso})}" th:text="${funcion.title}">Película</a>
+		<span aria-hidden="true">/</span>
+		<span>Butacas</span>
+	</p>
+	<div class="sala-layout">
+		<section>
+			<p class="eyebrow" th:text="${funcion.cinema} + ' · ' + ${funcion.neighborhood}">Platea Palermo</p>
+			<h1 th:text="${funcion.title}">Título</h1>
+			<p class="hero-meta">
+				<span th:text="${funcion.when}">Jueves 22 · 21:00</span>
+				<em th:class="'fmt fmt-' + ${funcion.formatKey}" th:text="${funcion.format}">2D</em>
+				<span th:text="${funcion.language}">Subtitulada</span>
+				<span class="rating" th:classappend="'rating-' + ${funcion.ratingKey}" th:text="${funcion.rating}">+13</span>
+			</p>
+			<p class="address" th:text="${funcion.auditorium} + ' · ' + ${funcion.address} + ', ' + ${funcion.city}">Sala 1</p>
+			<p class="banner banner-error" th:if="${error}" th:text="${error}" role="alert"></p>
+			<p class="banner" th:if="${funcion.closed}">Esta función ya comenzó. Elegí otro horario.</p>
+
+			<form id="butacas-form" data-seat-form method="post" th:action="@{/funciones/{id}/retener(id=${funcion.id})}" th:attr="data-closed=${funcion.closed}">
+				<div class="mapa-scroll">
+					<div class="sala">
+						<div class="screen" aria-hidden="true"><span>Pantalla</span></div>
+						<div class="fila" th:each="fila : ${funcion.rows}">
+							<span class="letra" th:text="${fila.letter}">A</span>
+							<div class="bloques">
+								<div class="bloque" th:each="bloque : ${fila.blocks}">
+									<label class="butaca" th:each="b : ${bloque}" th:classappend="${b.premium} ? 'es-pref' : ''">
+										<input type="checkbox" name="butacas"
+										       th:value="${b.code}"
+										       th:checked="${b.state == 'mia'}"
+										       th:disabled="${b.state == 'ocupada' or funcion.closed}"
+										       th:attr="data-price=${b.price},data-row=${fila.letter},data-number=${b.number},data-premium=${b.premium},data-locked=${b.state == 'ocupada'},aria-label=${'Fila ' + fila.letter + ', butaca ' + b.number + (b.premium ? ', preferencial' : '') + ', ' + b.priceText + (b.state == 'ocupada' ? ', ocupada' : '')}">
+										<span th:text="${b.number}" aria-hidden="true">1</span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ul class="leyenda">
+					<li><i class="swatch libre"></i> Libre</li>
+					<li><i class="swatch pref"></i> Preferencial</li>
+					<li><i class="swatch mia"></i> Tu selección</li>
+					<li><i class="swatch ocupada"></i> Ocupada</li>
+				</ul>
+				<p class="hint" th:unless="${funcion.closed}" th:text="'Al continuar te guardamos las butacas por ' + ${funcion.holdMinutes} + ' minutos. Máximo 8 por compra.'">Reserva</p>
+			</form>
+		</section>
+		<aside class="resumen">
+			<p class="eyebrow">Tu selección</p>
+			<h2 th:text="${funcion.title}">Título</h2>
+			<p th:text="${funcion.cinema} + ' · ' + ${funcion.auditorium}">Sala</p>
+			<p th:text="${funcion.when}">Cuándo</p>
+			<p class="count" data-count th:text="${funcion.selectedCount == 1} ? '1 butaca' : (${funcion.selectedCount} + ' butacas')">0 butacas</p>
+			<ul data-selected class="selected-list"></ul>
+			<p class="total" data-total th:text="${funcion.selectedTotal}">$ 0</p>
+			<button class="button" type="submit" form="butacas-form" data-continue th:if="${!funcion.closed}">Continuar</button>
+			<a class="text-link" th:href="@{/peliculas/{slug}(slug=${funcion.slug}, fecha=${funcion.dateIso})}">Cambiar función</a>
+		</aside>
+	</div>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+<script src="/js/butacas.js"></script>
+</body>
+</html>

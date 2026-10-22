@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/chrome :: head(titulo='Pago')}"></head>
+<body>
+<header th:replace="~{fragments/chrome :: header}"></header>
+<main id="contenido" class="sheet">
+	<section th:if="${compra == null}" class="empty-panel">
+		<p class="eyebrow">Checkout</p>
+		<h1>No tenés butacas reservadas</h1>
+		<p class="lede" th:if="${errorReserva}" th:text="${errorReserva}">La reserva venció.</p>
+		<p class="lede" th:unless="${errorReserva}">Elegí una función y marcá tus asientos. Te los guardamos ocho minutos para pagar.</p>
+		<a class="button" href="/">Ir a la cartelera</a>
+	</section>
+
+	<div class="checkout" th:if="${compra != null}">
+		<form class="pay-form" method="post" action="/checkout" th:object="${form}" autocomplete="off" novalidate>
+			<p class="eyebrow">Pago simulado</p>
+			<h1>Datos para la entrada</h1>
+			<p class="hint">No se hace ningún cargo. Podés usar <strong>4242 4242 4242 4242</strong>, vencimiento futuro y cualquier CVV. Si el número termina en 0000, el pago se rechaza.</p>
+			<p class="banner banner-error" th:if="${errorReserva}" th:text="${errorReserva}" role="alert"></p>
+
+			<div class="fields">
+				<label>Nombre y apellido
+					<input type="text" th:field="*{nombre}" autocomplete="name" required maxlength="80">
+					<small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">Error</small>
+				</label>
+				<label>Email
+					<input type="email" th:field="*{email}" autocomplete="email" required maxlength="120">
+					<small th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</small>
+				</label>
+				<label>Teléfono <span>(opcional)</span>
+					<input type="tel" th:field="*{telefono}" autocomplete="tel" maxlength="30">
+					<small th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}">Error</small>
+				</label>
+			</div>
+
+			<fieldset>
+				<legend>Tarjeta</legend>
+				<label>Número
+					<input type="text" inputmode="numeric" autocomplete="off" data-pan th:field="*{tarjeta}" placeholder="4242 4242 4242 4242" required>
+					<small th:if="${#fields.hasErrors('tarjeta')}" th:errors="*{tarjeta}">Error</small>
+				</label>
+				<div class="split">
+					<label>Vencimiento
+						<input type="text" inputmode="numeric" autocomplete="off" data-exp th:field="*{vencimiento}" placeholder="MM/AA" maxlength="5" required>
+						<small th:if="${#fields.hasErrors('vencimiento')}" th:errors="*{vencimiento}">Error</small>
+					</label>
+					<label>CVV
+						<input type="text" inputmode="numeric" autocomplete="off" name="cvv" maxlength="4" required>
+						<small th:if="${#fields.hasErrors('cvv')}" th:errors="*{cvv}">Error</small>
+					</label>
+				</div>
+				<label>Titular
+					<input type="text" th:field="*{titular}" autocomplete="cc-name" required maxlength="80">
+					<small th:if="${#fields.hasErrors('titular')}" th:errors="*{titular}">Error</small>
+				</label>
+			</fieldset>
+
+			<p class="timer" th:attr="data-expira=${compra.expiresAt}">
+				Butacas reservadas hasta las <strong th:text="${compra.until}">21:54</strong>.
+				Quedan <strong data-cuenta>8:00</strong>.
+				<span data-vencida hidden>La reserva venció. Si al pagar las butacas ya se liberaron, volvé a elegirlas.</span>
+			</p>
+			<button class="button" type="submit" data-pagar>Pagar y emitir entradas</button>
+		</form>
+
+		<aside class="resumen resumen-static">
+			<p class="eyebrow">Resumen</p>
+			<h2 th:text="${compra.title}">Película</h2>
+			<p th:text="${compra.cinema}">Complejo</p>
+			<p th:text="${compra.address}">Dirección</p>
+			<p th:text="${compra.when}">Cuándo</p>
+			<p><em th:text="${compra.format}">2D</em> · <span th:text="${compra.language}">Subtitulada</span></p>
+			<ul class="selected-list">
+				<li th:each="line : ${compra.lines}">
+					<span th:text="${line.label + (line.premium ? ' · Preferencial' : '')}">Fila C · Butaca 5</span>
+					<strong th:text="${line.price}">$ 7.900</strong>
+				</li>
+			</ul>
+			<p class="total" th:text="${compra.total}">$ 15.800</p>
+			<form method="post" action="/checkout/soltar">
+				<input type="hidden" name="funcion" th:value="${compra.showtimeId}">
+				<button class="text-button" type="submit">Soltar butacas</button>
+			</form>
+		</aside>
+	</div>
+</main>
+<footer th:replace="~{fragments/chrome :: footer}"></footer>
+<script th:src="@{/js/checkout.js(v=2)}"></script>
+</body>
+</html>
