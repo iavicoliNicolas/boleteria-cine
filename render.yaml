@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: platea
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: THYMELEAF_CACHE
+        value: "true"
